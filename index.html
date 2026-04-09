@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claviculário</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="claviculario">
+<div class="titulo">CLAVICULÁRIO</div>
+
+<div class="blocos">
+<div class="bloco">
+<div class="bloco-titulo">BLOCO A</div>
+<div id="blocoA"></div>
+</div>
+
+<div class="bloco">
+<div class="bloco-titulo">BLOCO B</div>
+<div id="blocoB"></div>
+</div>
+</div>
+</div>
+
+<div class="painel">
+<div class="painel-titulo">RETIRADA / DEVOLUÇÃO</div>
+
+<div class="label">ID Funcionário</div>
+<input class="input" id="idFuncionario" autofocus>
+
+<div class="label">Código da Chave</div>
+<input class="input" id="codigoChave">
+
+<div class="botoes">
+<button class="btn retirar" onclick="registrar('RETIRADA')">RETIRAR</button>
+<button class="btn devolver" onclick="registrar('DEVOLUCAO')">DEVOLVER</button>
+</div>
+
+<div class="log" id="log"></div>
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

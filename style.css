@@ -1,0 +1,150 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI, Arial, sans-serif;
+}
+
+body{
+    overflow:hidden;
+    background:#f1f5f9;
+    color:#0f172a;
+}
+
+.container{
+    width:100vw;
+    height:100vh;
+    display:grid;
+    grid-template-columns: 3fr 1.2fr;
+    gap:15px;
+    padding:15px;
+}
+
+.claviculario{
+    display:flex;
+    flex-direction:column;
+}
+
+.titulo{
+    font-size:30px;
+    font-weight:700;
+    margin-bottom:12px;
+}
+
+.blocos{
+    flex:1;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.bloco{
+    background:white;
+    border-radius:12px;
+    padding:15px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.bloco-titulo{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:12px;
+    text-align:center;
+}
+
+.linha-container{
+    margin-bottom:14px;
+}
+
+.linha-titulo{
+    font-size:16px;
+    font-weight:700;
+    color:#475569;
+    margin-bottom:6px;
+}
+
+.linha{
+    display:grid;
+    grid-template-columns:repeat(10, 1fr);
+    gap:10px;
+}
+
+.chave{
+    height:60px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border-radius:10px;
+    font-weight:700;
+    font-size:18px;
+}
+
+.disponivel{
+    background:#bbf7d0;
+    color:#14532d;
+}
+
+.retirada{
+    background:#fecaca;
+    color:#7f1d1d;
+}
+
+/* painel */
+
+.painel{
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.painel-titulo{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:20px;
+    text-align:center;
+}
+
+.label{
+    font-size:16px;
+    margin-bottom:5px;
+}
+
+.input{
+    width:100%;
+    padding:16px;
+    border-radius:8px;
+    border:1px solid #cbd5e1;
+    font-size:18px;
+    margin-bottom:15px;
+}
+
+.botoes{
+    display:flex;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.btn{
+    flex:1;
+    padding:16px;
+    font-size:16px;
+    font-weight:700;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.retirar{ background:#fbbf24; }
+.devolver{ background:#60a5fa; }
+
+.log{
+    flex:1;
+    background:#f8fafc;
+    border-radius:8px;
+    padding:10px;
+    font-size:13px;
+    overflow:hidden;
+}
