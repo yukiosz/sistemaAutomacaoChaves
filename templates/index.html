@@ -23,6 +23,7 @@
             </div>
 
             <div class="controle-area">
+                <button class="btn exportar" onclick="exportarDados()">EXPORTAR</button>
 
                 <div class="inputs-area">
                     <input type="text" class="input" id="idFuncionario" placeholder="ID Funcionário" autofocus>
@@ -69,7 +70,13 @@
             <button class="fechar-modal" onclick="fecharModal()">Fechar</button>
         </div>
     </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
 
+        if (params.get("msg") === "sem_dados") {
+            alert("Não há novos registros para exportar.");
+        }
+    </script>
     <script src="../static/script.js"></script>
 </body>
 

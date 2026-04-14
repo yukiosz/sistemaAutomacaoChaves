@@ -156,5 +156,9 @@ document.querySelectorAll(".input").forEach(i=>{
     })
 })
 
+function exportarDados(){
+    window.location.href = "/exportar"
+}
+
 carregarEstado()
 

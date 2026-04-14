@@ -2,6 +2,12 @@ from flask import Flask, render_template, request, jsonify
 import sqlite3
 from datetime import datetime
 
+from flask import redirect, url_for
+
+from flask import Response
+import csv
+import io
+
 app = Flask(__name__)
 
 DATABASE = "database.db"
@@ -148,6 +154,75 @@ def info(codigo):
         "data": dado["data_retirada"]
     })
 
+from flask import Response
+import csv
+import io
+
+@app.route("/exportar")
+def exportar():
+
+    conn = get_db()
+
+    dados = conn.execute("""
+        SELECT 
+            e.id,
+            f.prontuario,
+            f.nome,
+            c.codigo,
+            e.data_retirada,
+            e.data_devolucao
+        FROM emprestimos e
+        JOIN funcionarios f ON f.id = e.funcionario_id
+        JOIN chaves c ON c.id = e.chave_id
+        WHERE e.exportado = 0
+        ORDER BY e.data_retirada
+    """).fetchall()
+
+    if not dados:
+        conn.close()
+        return redirect(url_for("index", msg="sem_dados"))
+
+    output = io.StringIO()
+    writer = csv.writer(output, delimiter=';')
+
+    writer.writerow([
+        "prontuario-servidor",
+        "nome-servidor",
+        "codigo-chave",
+        "horario-retirada",
+        "horario-devolucao"
+    ])
+
+    ids_exportados = []
+
+    for row in dados:
+        writer.writerow([
+            row["prontuario"],
+            row["nome"],
+            row["codigo"],
+            row["data_retirada"],
+            row["data_devolucao"]
+        ])
+        ids_exportados.append(row["id"])
+
+    conn.executemany(
+        "UPDATE emprestimos SET exportado = 1 WHERE id = ?",
+        [(i,) for i in ids_exportados]
+    )
+
+    conn.commit()
+    conn.close()
+
+    agora = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    nome_arquivo = f"emprestimos_{agora}.csv"
+
+    return Response(
+        u'\ufeff' + output.getvalue(),
+        mimetype="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f"attachment; filename={nome_arquivo}"
+        }
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
