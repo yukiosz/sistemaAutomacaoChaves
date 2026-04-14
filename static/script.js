@@ -75,12 +75,18 @@ function render(lista,id){
 
 async function registrar(tipo){
 
+    const msg = document.getElementById("mensagemErro")
+    msg.innerText = ""
+
     const id=document.getElementById("idFuncionario").value.trim()
     const chave=document.getElementById("codigoChave").value.trim().toUpperCase()
 
-    if(!id || !chave) return
+    if(!id || !chave){
+        msg.innerText = "Informe o funcionário e a chave"
+        return
+    }
 
-    await fetch("/registrar",{
+    const r = await fetch("/registrar",{
         method:"POST",
         headers:{ "Content-Type":"application/json" },
         body:JSON.stringify({
@@ -89,6 +95,15 @@ async function registrar(tipo){
             tipo:tipo
         })
     })
+
+    const resp = await r.json()
+
+    if(resp.status === "erro"){
+        msg.innerText = resp.mensagem || "Erro ao processar operação"
+        return
+    }
+
+    msg.innerText = ""
 
     document.getElementById("idFuncionario").value=""
     document.getElementById("codigoChave").value=""
@@ -119,4 +134,27 @@ function fecharModal(){
     document.getElementById("modalOverlay").classList.add("hidden")
 }
 
+document.getElementById("idFuncionario")
+.addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+        e.preventDefault()
+        document.getElementById("codigoChave").focus()
+    }
+})
+
+document.getElementById("codigoChave")
+.addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+        e.preventDefault()
+        registrar("RETIRADA")
+    }
+})
+
+document.querySelectorAll(".input").forEach(i=>{
+    i.addEventListener("input",()=>{
+        document.getElementById("mensagemErro").innerText=""
+    })
+})
+
 carregarEstado()
+

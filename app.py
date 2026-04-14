@@ -42,34 +42,40 @@ def registrar():
 
     conn = get_db()
 
-    # valida funcionario
     funcionario = conn.execute(
         "SELECT * FROM funcionarios WHERE prontuario=?",
         (prontuario,)
     ).fetchone()
 
     if not funcionario:
-        return jsonify({"status":"erro"})
+        return jsonify({
+            "status":"erro",
+            "mensagem":"Funcionário não encontrado"
+        })
 
-    # valida chave
     chave = conn.execute(
         "SELECT * FROM chaves WHERE codigo=?",
         (codigo,)
     ).fetchone()
 
     if not chave:
-        return jsonify({"status":"erro"})
+        return jsonify({
+            "status":"erro",
+            "mensagem":"Chave não encontrada"
+        })
 
     if tipo == "RETIRADA":
 
-        # verifica se já emprestada
         ativo = conn.execute("""
             SELECT * FROM emprestimos
             WHERE chave_id=? AND devolvido=0
         """,(chave["id"],)).fetchone()
 
         if ativo:
-            return jsonify({"status":"erro"})
+            return jsonify({
+                "status":"erro",
+                "mensagem":"Chave não disponível"
+            })
 
         agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -82,11 +88,30 @@ def registrar():
     else:
         agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        emprestimo = conn.execute("""
+            SELECT e.id, f.prontuario
+            FROM emprestimos e
+            JOIN funcionarios f ON f.id = e.funcionario_id
+            WHERE e.chave_id=? AND e.devolvido=0
+        """,(chave["id"],)).fetchone()
+
+        if not emprestimo:
+            return jsonify({
+                "status":"erro",
+                "mensagem":"Chave não está emprestada"
+            })
+
+        if emprestimo["prontuario"] != prontuario:
+            return jsonify({
+                "status":"erro",
+                "mensagem":"Prontuário difere do informado na retirada da chave"
+            })
+
         conn.execute("""
             UPDATE emprestimos
             SET devolvido=1, data_devolucao=?
-            WHERE chave_id=? AND devolvido=0
-        """,(agora, chave["id"]))
+            WHERE id=?
+        """,(agora, emprestimo["id"]))
 
     conn.commit()
     conn.close()

@@ -64,7 +64,8 @@ body{
 .inputs-area{
     display:flex;
     flex-direction:column;
-    gap:14px;
+    justify-content:center;
+    gap:6px;
     width:320px;
 }
 
@@ -259,4 +260,14 @@ body{
     font-size:14px;
     color:#51627f;
     margin-top:2px;
+}
+
+.mensagem-erro{
+    height:18px;
+    font-size:14px;
+    font-weight:600;
+    color:#d90429;
+    padding-left:4px;
+    display:flex;
+    align-items:center;
 }

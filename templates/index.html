@@ -1,71 +1,76 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Claviculário IFSP Bragança Paulista</title>
-<link rel="stylesheet" href="../static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Claviculário IFSP Bragança Paulista</title>
+    <link rel="stylesheet" href="../static/style.css">
 </head>
+
 <body>
 
-<div class="app">
+    <div class="app">
 
-    <!-- TOPO -->
-    <header class="topo">
+        <!-- TOPO -->
+        <header class="topo">
 
-        <div class="logo-area">
-            <img src="../static/images/logoIFSPBRA.png" alt="IFSP Bragança Paulista" class="logo">
-            <div class="titulo-area">
-                <h1>Sistema de Controle de Chaves</h1>
-            </div>
-        </div>
-
-        <div class="controle-area">
-
-            <div class="inputs-area">
-                <input type="text" class="input" id="idFuncionario" placeholder="ID Funcionário" autofocus>
-                <input type="text" class="input" id="codigoChave" placeholder="Código da Chave">
+            <div class="logo-area">
+                <img src="../static/images/logoIFSPBRA.png" alt="IFSP Bragança Paulista" class="logo">
+                <div class="titulo-area">
+                    <h1>Sistema de Controle de Chaves</h1>
+                </div>
             </div>
 
-            <div class="botoes">
-                <button class="btn retirar" onclick="registrar('RETIRADA')">RETIRAR</button>
-                <button class="btn devolver" onclick="registrar('DEVOLUCAO')">DEVOLVER</button>
+            <div class="controle-area">
+
+                <div class="inputs-area">
+                    <input type="text" class="input" id="idFuncionario" placeholder="ID Funcionário" autofocus>
+                    <input type="text" class="input" id="codigoChave" placeholder="Código da Chave">
+
+                    <div id="mensagemErro" class="mensagem-erro"></div>
+                </div>
+
+                <div class="botoes">
+                    <button class="btn retirar" onclick="registrar('RETIRADA')">RETIRAR</button>
+                    <button class="btn devolver" onclick="registrar('DEVOLUCAO')">DEVOLVER</button>
+                </div>
+
             </div>
 
-        </div>
+        </header>
 
-    </header>
+        <!-- CONTEÚDO -->
+        <main class="conteudo">
 
-    <!-- CONTEÚDO -->
-    <main class="conteudo">
+            <div class="blocos">
 
-        <div class="blocos">
+                <section class="bloco bloco-a">
+                    <div class="bloco-titulo">PRÉDIO A</div>
+                    <div id="blocoA"></div>
+                </section>
 
-            <section class="bloco bloco-a">
-                <div class="bloco-titulo">PRÉDIO A</div>
-                <div id="blocoA"></div>
-            </section>
+                <section class="bloco bloco-b">
+                    <div class="bloco-titulo">PRÉDIO B</div>
+                    <div id="blocoB"></div>
+                </section>
 
-            <section class="bloco bloco-b">
-                <div class="bloco-titulo">PRÉDIO B</div>
-                <div id="blocoB"></div>
-            </section>
+            </div>
 
-        </div>
+        </main>
 
-    </main>
-
-</div>
-
-<!-- MODAL -->
-<div id="modalOverlay" class="modal-overlay hidden">
-    <div class="modal">
-        <h2>Informações da Chave</h2>
-        <div id="modalConteudo"></div>
-        <button class="fechar-modal" onclick="fecharModal()">Fechar</button>
     </div>
-</div>
 
-<script src="../static/script.js"></script>
+    <!-- MODAL -->
+    <div id="modalOverlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h2>Informações da Chave</h2>
+            <div id="modalConteudo"></div>
+            <button class="fechar-modal" onclick="fecharModal()">Fechar</button>
+        </div>
+    </div>
+
+    <script src="../static/script.js"></script>
 </body>
+
 </html>
