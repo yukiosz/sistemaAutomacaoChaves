@@ -30,7 +30,7 @@ def estado():
         SELECT c.codigo
         FROM emprestimos e
         JOIN chaves c ON c.id = e.chave_id
-        WHERE e.devolvido = 0
+        WHERE e.data_devolucao IS NULL
     """).fetchall()
 
     conn.close()
