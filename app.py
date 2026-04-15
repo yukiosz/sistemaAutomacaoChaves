@@ -1,10 +1,6 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Response
 import sqlite3
 from datetime import datetime
-
-from flask import redirect, url_for
-
-from flask import Response
 import csv
 import io
 
@@ -12,10 +8,12 @@ app = Flask(__name__)
 
 DATABASE = "database.db"
 
+
 def get_db():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 @app.route("/")
 def index():
@@ -55,8 +53,8 @@ def registrar():
 
     if not funcionario:
         return jsonify({
-            "status":"erro",
-            "mensagem":"Funcionário não encontrado"
+            "status": "erro",
+            "mensagem": "Funcionário não encontrado"
         })
 
     chave = conn.execute(
@@ -66,30 +64,30 @@ def registrar():
 
     if not chave:
         return jsonify({
-            "status":"erro",
-            "mensagem":"Chave não encontrada"
+            "status": "erro",
+            "mensagem": "Chave não encontrada"
         })
 
     if tipo == "RETIRADA":
 
         ativo = conn.execute("""
             SELECT * FROM emprestimos
-            WHERE chave_id=? AND devolvido=0
-        """,(chave["id"],)).fetchone()
+            WHERE chave_id=? AND data_devolucao IS NULL
+        """, (chave["id"],)).fetchone()
 
         if ativo:
             return jsonify({
-                "status":"erro",
-                "mensagem":"Chave não disponível"
+                "status": "erro",
+                "mensagem": "Chave não disponível"
             })
 
         agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         conn.execute("""
             INSERT INTO emprestimos
-            (chave_id, funcionario_id, data_retirada, devolvido)
-            VALUES (?,?,?,0)
-        """,(chave["id"], funcionario["id"], agora))
+            (chave_id, funcionario_id, data_retirada)
+            VALUES (?,?,?)
+        """, (chave["id"], funcionario["id"], agora))
 
     else:
         agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -98,31 +96,31 @@ def registrar():
             SELECT e.id, f.prontuario
             FROM emprestimos e
             JOIN funcionarios f ON f.id = e.funcionario_id
-            WHERE e.chave_id=? AND e.devolvido=0
-        """,(chave["id"],)).fetchone()
+            WHERE e.chave_id=? AND e.data_devolucao IS NULL
+        """, (chave["id"],)).fetchone()
 
         if not emprestimo:
             return jsonify({
-                "status":"erro",
-                "mensagem":"Chave não está emprestada"
+                "status": "erro",
+                "mensagem": "Chave não está emprestada"
             })
 
         if emprestimo["prontuario"] != prontuario:
             return jsonify({
-                "status":"erro",
-                "mensagem":"Prontuário difere do informado na retirada da chave"
+                "status": "erro",
+                "mensagem": "Prontuário difere do informado na retirada da chave"
             })
 
         conn.execute("""
             UPDATE emprestimos
-            SET devolvido=1, data_devolucao=?
+            SET data_devolucao=?
             WHERE id=?
-        """,(agora, emprestimo["id"]))
+        """, (agora, emprestimo["id"]))
 
     conn.commit()
     conn.close()
 
-    return jsonify({"status":"ok"})
+    return jsonify({"status": "ok"})
 
 
 @app.route("/info/<codigo>")
@@ -139,8 +137,8 @@ def info(codigo):
         FROM emprestimos e
         JOIN chaves c ON c.id = e.chave_id
         JOIN funcionarios f ON f.id = e.funcionario_id
-        WHERE c.codigo=? AND e.devolvido=0
-    """,(codigo,)).fetchone()
+        WHERE c.codigo=? AND e.data_devolucao IS NULL
+    """, (codigo,)).fetchone()
 
     conn.close()
 
@@ -154,9 +152,6 @@ def info(codigo):
         "data": dado["data_retirada"]
     })
 
-from flask import Response
-import csv
-import io
 
 @app.route("/exportar")
 def exportar():
@@ -223,6 +218,7 @@ def exportar():
             "Content-Disposition": f"attachment; filename={nome_arquivo}"
         }
     )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
