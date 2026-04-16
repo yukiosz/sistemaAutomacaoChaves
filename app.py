@@ -19,6 +19,9 @@ def get_db():
 def index():
     return render_template("index.html")
 
+@app.route("/admin")
+def admin():
+    return render_template("admin.html")
 
 @app.route("/estado")
 def estado():
@@ -53,8 +56,8 @@ def registrar():
 
     if not funcionario:
         return jsonify({
-            "status": "erro",
-            "mensagem": "Funcionário não encontrado"
+            "status":"erro",
+            "mensagem":"Funcionário não encontrado"
         })
 
     chave = conn.execute(
@@ -64,63 +67,55 @@ def registrar():
 
     if not chave:
         return jsonify({
-            "status": "erro",
-            "mensagem": "Chave não encontrada"
+            "status":"erro",
+            "mensagem":"Chave não encontrada"
         })
+
+    agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if tipo == "RETIRADA":
 
         ativo = conn.execute("""
             SELECT * FROM emprestimos
             WHERE chave_id=? AND data_devolucao IS NULL
-        """, (chave["id"],)).fetchone()
+        """,(chave["id"],)).fetchone()
 
         if ativo:
             return jsonify({
-                "status": "erro",
-                "mensagem": "Chave não disponível"
+                "status":"erro",
+                "mensagem":"Chave não disponível"
             })
-
-        agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         conn.execute("""
             INSERT INTO emprestimos
-            (chave_id, funcionario_id, data_retirada)
+            (chave_id, retirado_por, data_retirada)
             VALUES (?,?,?)
-        """, (chave["id"], funcionario["id"], agora))
+        """,(chave["id"], funcionario["id"], agora))
 
     else:
-        agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         emprestimo = conn.execute("""
-            SELECT e.id, f.prontuario
-            FROM emprestimos e
-            JOIN funcionarios f ON f.id = e.funcionario_id
-            WHERE e.chave_id=? AND e.data_devolucao IS NULL
-        """, (chave["id"],)).fetchone()
+            SELECT id
+            FROM emprestimos
+            WHERE chave_id=? AND data_devolucao IS NULL
+        """,(chave["id"],)).fetchone()
 
         if not emprestimo:
             return jsonify({
-                "status": "erro",
-                "mensagem": "Chave não está emprestada"
-            })
-
-        if emprestimo["prontuario"] != prontuario:
-            return jsonify({
-                "status": "erro",
-                "mensagem": "Prontuário difere do informado na retirada da chave"
+                "status":"erro",
+                "mensagem":"Chave não está emprestada"
             })
 
         conn.execute("""
             UPDATE emprestimos
-            SET data_devolucao=?
+            SET devolvido_por=?, data_devolucao=?
             WHERE id=?
-        """, (agora, emprestimo["id"]))
+        """,(funcionario["id"], agora, emprestimo["id"]))
 
     conn.commit()
     conn.close()
 
-    return jsonify({"status": "ok"})
+    return jsonify({"status":"ok"})
 
 
 @app.route("/info/<codigo>")
@@ -136,9 +131,9 @@ def info(codigo):
             e.data_retirada
         FROM emprestimos e
         JOIN chaves c ON c.id = e.chave_id
-        JOIN funcionarios f ON f.id = e.funcionario_id
+        JOIN funcionarios f ON f.id = e.retirado_por
         WHERE c.codigo=? AND e.data_devolucao IS NULL
-    """, (codigo,)).fetchone()
+    """,(codigo,)).fetchone()
 
     conn.close()
 
@@ -161,13 +156,16 @@ def exportar():
     dados = conn.execute("""
         SELECT 
             e.id,
-            f.prontuario,
-            f.nome,
+            fr.prontuario as retirado_prontuario,
+            fr.nome as retirado_nome,
+            fd.prontuario as devolvido_prontuario,
+            fd.nome as devolvido_nome,
             c.codigo,
             e.data_retirada,
             e.data_devolucao
         FROM emprestimos e
-        JOIN funcionarios f ON f.id = e.funcionario_id
+        JOIN funcionarios fr ON fr.id = e.retirado_por
+        LEFT JOIN funcionarios fd ON fd.id = e.devolvido_por
         JOIN chaves c ON c.id = e.chave_id
         WHERE e.exportado = 0
         ORDER BY e.data_retirada
@@ -181,8 +179,10 @@ def exportar():
     writer = csv.writer(output, delimiter=';')
 
     writer.writerow([
-        "prontuario-servidor",
-        "nome-servidor",
+        "prontuario-retirada",
+        "nome-retirada",
+        "prontuario-devolucao",
+        "nome-devolucao",
         "codigo-chave",
         "horario-retirada",
         "horario-devolucao"
@@ -192,8 +192,10 @@ def exportar():
 
     for row in dados:
         writer.writerow([
-            row["prontuario"],
-            row["nome"],
+            row["retirado_prontuario"],
+            row["retirado_nome"],
+            row["devolvido_prontuario"] or "",
+            row["devolvido_nome"] or "",
             row["codigo"],
             row["data_retirada"],
             row["data_devolucao"]

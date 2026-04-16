@@ -78,8 +78,8 @@ async function registrar(tipo){
     const msg = document.getElementById("mensagemErro")
     msg.innerText = ""
 
-    const id=document.getElementById("idFuncionario").value.trim()
-    const chave=document.getElementById("codigoChave").value.trim().toUpperCase()
+    const id = document.getElementById("idFuncionario").value.trim()
+    const chave = document.getElementById("codigoChave").value.trim().toUpperCase()
 
     if(!id || !chave){
         msg.innerText = "Informe o funcionário e a chave"
@@ -103,11 +103,15 @@ async function registrar(tipo){
         return
     }
 
+    // sucesso -> limpa erro
     msg.innerText = ""
 
-    document.getElementById("idFuncionario").value=""
-    document.getElementById("codigoChave").value=""
-    document.getElementById("idFuncionario").focus()
+    // sucesso -> mostra modal
+    if(tipo === "RETIRADA"){
+        mostrarFeedback("Retirada realizada com sucesso")
+    }else{
+        mostrarFeedback("Devolução realizada com sucesso")
+    }
 
     carregarEstado()
 }
@@ -129,6 +133,29 @@ async function abrirModal(chave){
 
     document.getElementById("modalOverlay").classList.remove("hidden")
 }
+function mostrarFeedback(texto){
+
+    const box = document.getElementById("feedback")
+    const span = document.getElementById("feedbackTexto")
+
+    span.textContent = texto
+
+    box.classList.remove("hide")
+    box.classList.add("show")
+
+    setTimeout(()=>{
+
+        box.classList.remove("show")
+        box.classList.add("hide")
+
+        setTimeout(()=>{
+            document.getElementById("idFuncionario").value=""
+            document.getElementById("codigoChave").value=""
+            document.getElementById("idFuncionario").focus()
+        },300)
+
+    },2000)
+}           
 
 function fecharModal(){
     document.getElementById("modalOverlay").classList.add("hidden")

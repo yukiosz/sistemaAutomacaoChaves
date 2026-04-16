@@ -23,8 +23,6 @@
             </div>
 
             <div class="controle-area">
-                <button class="btn exportar" onclick="exportarDados()">EXPORTAR</button>
-
                 <div class="inputs-area">
                     <input type="text" class="input" id="idFuncionario" placeholder="ID Funcionário" autofocus>
                     <input type="text" class="input" id="codigoChave" placeholder="Código da Chave">
@@ -70,6 +68,12 @@
             <button class="fechar-modal" onclick="fecharModal()">Fechar</button>
         </div>
     </div>
+
+    <div id="feedback" class="feedback">
+        <span id="feedbackTexto"></span>
+    </div>
+
+
     <script>
         const params = new URLSearchParams(window.location.search);
 

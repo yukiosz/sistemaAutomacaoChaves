@@ -3,7 +3,7 @@ import sqlite3
 conn = sqlite3.connect("database.db")
 cursor = conn.cursor()
 
-# funcionários
+# funcionarios
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS funcionarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,17 +22,24 @@ CREATE TABLE IF NOT EXISTS chaves (
 )
 """)
 
-# emprestimos (COM CONTROLE DE EXPORTAÇÃO)
+# emprestimos (NOVO MODELO COM RETIRADA E DEVOLUÇÃO SEPARADAS)
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS emprestimos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    funcionario_id INTEGER NOT NULL,
+
     chave_id INTEGER NOT NULL,
+
+    retirado_por INTEGER NOT NULL,
+    devolvido_por INTEGER,
+
     data_retirada DATETIME NOT NULL,
     data_devolucao DATETIME,
+
     exportado INTEGER DEFAULT 0,
-    FOREIGN KEY (funcionario_id) REFERENCES funcionarios(id),
-    FOREIGN KEY (chave_id) REFERENCES chaves(id)
+
+    FOREIGN KEY (chave_id) REFERENCES chaves(id),
+    FOREIGN KEY (retirado_por) REFERENCES funcionarios(id),
+    FOREIGN KEY (devolvido_por) REFERENCES funcionarios(id)
 )
 """)
 
