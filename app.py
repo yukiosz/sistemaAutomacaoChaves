@@ -3,6 +3,7 @@ import sqlite3
 from datetime import datetime
 import csv
 import io
+import re
 
 app = Flask(__name__)
 
@@ -38,85 +39,130 @@ def estado():
 
     return jsonify([d["codigo"] for d in dados])
 
+def normalizar_prontuario(valor):
+    valor = valor.strip().upper()
+
+    if re.match(r'^[A-Z]{2}[A-Z0-9]+$', valor):
+        return {"tipo": "completo", "valor": valor[2:]}
+
+    if valor.startswith("01100"):
+        return {"tipo": "parcial", "valor": valor[5:]}
+
+    return {"tipo": "completo", "valor": valor}
+
 
 @app.route("/registrar", methods=["POST"])
 def registrar():
     data = request.json
 
-    prontuario = data["id"]
+    prontuario_input = data["id"]
     codigo = data["chave"]
     tipo = data["tipo"]
 
     conn = get_db()
 
-    funcionario = conn.execute(
-        "SELECT * FROM funcionarios WHERE prontuario=?",
-        (prontuario,)
-    ).fetchone()
+    # 🔎 NORMALIZAÇÃO DO PRONTUÁRIO
+    info = normalizar_prontuario(prontuario_input)
 
+    if info["tipo"] == "completo":
+        funcionario = conn.execute(
+            "SELECT * FROM funcionarios WHERE prontuario=?",
+            (info["valor"],)
+        ).fetchone()
+
+    else:
+        resultados = conn.execute(
+            "SELECT * FROM funcionarios WHERE prontuario LIKE ?",
+            (info["valor"] + "%",)
+        ).fetchall()
+
+        if len(resultados) == 0:
+            funcionario = None
+
+        elif len(resultados) > 1:
+            conn.close()
+            return jsonify({
+                "status": "erro",
+                "mensagem": "Múltiplos funcionários encontrados"
+            })
+
+        else:
+            funcionario = resultados[0]
+
+    # ❌ funcionário não encontrado
     if not funcionario:
+        conn.close()
         return jsonify({
-            "status":"erro",
-            "mensagem":"Funcionário não encontrado"
+            "status": "erro",
+            "mensagem": "Funcionário não encontrado"
         })
 
+    # 🔎 busca chave
     chave = conn.execute(
         "SELECT * FROM chaves WHERE codigo=?",
         (codigo,)
     ).fetchone()
 
     if not chave:
+        conn.close()
         return jsonify({
-            "status":"erro",
-            "mensagem":"Chave não encontrada"
+            "status": "erro",
+            "mensagem": "Chave não encontrada"
         })
 
     agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    # =========================
+    # RETIRADA
+    # =========================
     if tipo == "RETIRADA":
 
         ativo = conn.execute("""
             SELECT * FROM emprestimos
             WHERE chave_id=? AND data_devolucao IS NULL
-        """,(chave["id"],)).fetchone()
+        """, (chave["id"],)).fetchone()
 
         if ativo:
+            conn.close()
             return jsonify({
-                "status":"erro",
-                "mensagem":"Chave não disponível"
+                "status": "erro",
+                "mensagem": "Chave não disponível"
             })
 
         conn.execute("""
             INSERT INTO emprestimos
             (chave_id, retirado_por, data_retirada)
             VALUES (?,?,?)
-        """,(chave["id"], funcionario["id"], agora))
+        """, (chave["id"], funcionario["id"], agora))
 
+    # =========================
+    # DEVOLUÇÃO
+    # =========================
     else:
 
         emprestimo = conn.execute("""
             SELECT id
             FROM emprestimos
             WHERE chave_id=? AND data_devolucao IS NULL
-        """,(chave["id"],)).fetchone()
+        """, (chave["id"],)).fetchone()
 
         if not emprestimo:
+            conn.close()
             return jsonify({
-                "status":"erro",
-                "mensagem":"Chave não está emprestada"
+                "status": "erro",
+                "mensagem": "Chave não está emprestada"
             })
 
         conn.execute("""
             UPDATE emprestimos
             SET devolvido_por=?, data_devolucao=?
             WHERE id=?
-        """,(funcionario["id"], agora, emprestimo["id"]))
+        """, (funcionario["id"], agora, emprestimo["id"]))
 
     conn.commit()
     conn.close()
 
-    return jsonify({"status":"ok"})
-
+    return jsonify({"status": "ok"})
 
 @app.route("/info/<codigo>")
 def info(codigo):

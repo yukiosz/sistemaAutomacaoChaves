@@ -136,17 +136,20 @@ async function abrirModal(chave){
 function mostrarFeedback(texto){
 
     const box = document.getElementById("feedback")
+    const overlay = document.getElementById("feedbackOverlay")
     const span = document.getElementById("feedbackTexto")
 
     span.textContent = texto
 
-    box.classList.remove("hide")
+    // mostra
+    overlay.classList.add("show")
     box.classList.add("show")
 
     setTimeout(()=>{
 
+        // esconde
         box.classList.remove("show")
-        box.classList.add("hide")
+        overlay.classList.remove("show")
 
         setTimeout(()=>{
             document.getElementById("idFuncionario").value=""
@@ -155,7 +158,7 @@ function mostrarFeedback(texto){
         },300)
 
     },2000)
-}           
+}
 
 function fecharModal(){
     document.getElementById("modalOverlay").classList.add("hidden")
