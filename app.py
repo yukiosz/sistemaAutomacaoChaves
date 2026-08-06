@@ -29,15 +29,19 @@ def estado():
     conn = get_db()
 
     dados = conn.execute("""
-        SELECT c.codigo
+        SELECT c.codigo, f.nome
         FROM emprestimos e
         JOIN chaves c ON c.id = e.chave_id
+        JOIN funcionarios f ON f.id = e.retirado_por
         WHERE e.data_devolucao IS NULL
     """).fetchall()
 
     conn.close()
 
-    return jsonify([d["codigo"] for d in dados])
+    return jsonify([
+        {"codigo": d["codigo"], "nome": d["nome"]}
+        for d in dados
+    ])
 
 def normalizar_prontuario(valor):
     valor = valor.strip().upper()

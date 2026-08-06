@@ -178,11 +178,13 @@ body{
 
 .chave{
     width:110px;
-    height:50px;
+    min-height:50px;
+    padding:7px 5px;
     border-radius:10px;
     display:flex;
     justify-content:center;
     align-items:center;
+    flex-direction:column;
     font-size:18px;
     font-weight:800;
     color:white;
@@ -204,6 +206,22 @@ body{
 
 .retirada{
     background:linear-gradient(180deg,#ff3030,#d90429);
+}
+
+.codigo-chave{
+    font-size:18px;
+    line-height:1.1;
+}
+
+.responsavel-chave{
+    max-width:100%;
+    margin-top:3px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:11px;
+    font-weight:600;
+    line-height:1.1;
 }
 
 /* MODAL */

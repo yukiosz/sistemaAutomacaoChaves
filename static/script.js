@@ -31,6 +31,14 @@ function agrupar(lista){
     return grupos
 }
 
+function nomeResumido(nome){
+    const partes = nome.trim().split(/\s+/)
+
+    if(partes.length <= 1) return partes[0] || ""
+
+    return `${partes[0]} ${partes[partes.length - 1]}`
+}
+
 function render(lista,id){
     const container=document.getElementById(id)
     container.innerHTML=""
@@ -53,13 +61,24 @@ function render(lista,id){
 
             const div=document.createElement("div")
             div.classList.add("chave")
-            div.innerText=nome
             div.id="key-"+nome
 
-            if(emprestimos.includes(nome)){
+            const emprestimo = emprestimos.find(item => item.codigo === nome)
+
+            if(emprestimo){
                 div.classList.add("retirada")
+                const codigo = document.createElement("span")
+                codigo.classList.add("codigo-chave")
+                codigo.innerText = nome
+
+                const responsavel = document.createElement("span")
+                responsavel.classList.add("responsavel-chave")
+                responsavel.innerText = nomeResumido(emprestimo.nome)
+
+                div.append(codigo, responsavel)
             }else{
                 div.classList.add("disponivel")
+                div.innerText=nome
             }
 
             div.addEventListener("click",()=>abrirModal(nome))

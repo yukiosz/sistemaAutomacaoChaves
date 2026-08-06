@@ -2,8 +2,8 @@ import sqlite3
 import pandas as pd
 import os
 
-DATABASE = "../database.db"
-ARQUIVO_XLS = "./servidores.xls"
+DATABASE = "./database.db"
+ARQUIVO_XLS = "./setup/servidores.xls"
 
 def inserir_servidores():
 
