@@ -1,174 +1,44 @@
-# Sistema de Controle de Chaves – Claviculário
+# Sistema de Controle de Chaves
 
-Sistema web para controle de empréstimo e devolução de chaves com validação de funcionário, controle de disponibilidade e registro em banco de dados SQLite.
+Aplicação Flask para registrar a retirada e a devolução de chaves, usando SQLite.
 
----
+## Requisitos e execução
 
-# Requisitos
+Requer Python 3.8+ e Flask.
 
-* Python 3.8 ou superior
-* Pip instalado
-* Navegador web
-* Leitor de código de barras (opcional)
-
----
-
-# Estrutura do Projeto
-
-```
-claviculario/
-│
-├── app.py
-│
-├── setup/
-│   ├── create_database.py
-│   └── insert_chaves.py
-│
-├── templates/
-│   └── index.html
-│
-└── static/
-    ├── style.css
-    ├── script.js
-    └── images/
-```
-
----
-
-# Instalação
-
-## 1. Instalar dependências
-
-No terminal, dentro da pasta do projeto:
-
-```
+```bash
 pip install flask
-```
-
----
-
-## 2. Criar banco de dados
-
-Execute o script de criação:
-
-```
-python setup/create_database.py
-```
-
-Este comando irá criar o arquivo:
-
-```
-database.db
-```
-
----
-
-## 3. Inserir chaves no banco
-
-Execute:
-
-```
-python setup/insert_chaves.py
-```
-
-Isso irá cadastrar todas as chaves disponíveis no sistema.
-
----
-
-## 4. Inserir funcionários
-
-Antes de utilizar o sistema, é necessário cadastrar funcionários no banco.
-
-Exemplo:
-
-```
-INSERT INTO funcionarios (prontuario, nome)
-VALUES ('SP123', 'João Silva');
-```
-
-Você pode usar:
-
-* DB Browser for SQLite
-* sqlite3 via terminal
-* script Python
-
----
-
-# Executar o sistema
-
-Rodar o servidor:
-
-```
 python app.py
 ```
 
-Abrir no navegador:
+Abra `http://127.0.0.1:5000` no navegador. Para criar uma base nova, execute antes:
 
-```
-http://127.0.0.1:5000
-```
-
----
-
-# Fluxo de utilização
-
-## Retirada
-
-1. Ler código do funcionário
-2. Ler código da chave
-3. Pressionar ENTER (automático com leitor)
-4. Chave fica vermelha
-
-## Devolução
-
-1. Ler código do funcionário
-2. Ler código da chave
-3. Pressionar botão DEVOLVER
-4. Chave volta para verde
-
----
-
-# Regras do sistema
-
-* Funcionário deve existir no banco
-* Chave deve existir no banco
-* Chave não pode estar emprestada
-* Apenas o funcionário que retirou pode devolver
-* Data e hora são registradas automaticamente
-* Clique na chave vermelha mostra detalhes do empréstimo
-
----
-
-# Banco de Dados
-
-Tabelas:
-
-* funcionarios
-* chaves
-* emprestimos
-
----
-
-# Observações
-
-* O sistema funciona offline
-* SQLite não necessita instalação
-* Compatível com leitor de código de barras
-* Interface otimizada para uso rápido
-
----
-
-# Inicialização rápida
-
-```
-pip install flask
+```bash
 python setup/create_database.py
 python setup/insert_chaves.py
-python app.py
 ```
 
-Abrir:
+## Estrutura
 
+```text
+app.py                         # ponto de entrada do servidor
+sistema_chaves/
+  __init__.py                  # fábrica e configuração da aplicação Flask
+  database.py                  # conexão com o SQLite
+  routes.py                    # rotas HTTP e respostas da interface
+  services/
+    emprestimos.py             # regras de retirada, devolução e exportação
+templates/                     # páginas HTML
+static/                        # JavaScript, CSS e imagens
+setup/                         # criação e carga inicial do banco
+database.db                    # dados locais da aplicação
 ```
-http://127.0.0.1:5000
-```
+
+## Organização das responsabilidades
+
+- `routes.py` não contém regras de negócio: recebe a requisição e chama o serviço adequado.
+- `services/emprestimos.py` concentra as regras de funcionários, chaves e empréstimos. Novas regras do fluxo devem ser adicionadas aqui.
+- `database.py` é o único ponto de definição da localização e abertura do banco.
+- `app.py` somente inicializa o sistema, preservando o comando `python app.py`.
+
+As URLs públicas continuam as mesmas: `/`, `/admin`, `/estado`, `/registrar`, `/info/<codigo>` e `/exportar`.

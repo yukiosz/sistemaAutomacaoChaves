@@ -20,8 +20,6 @@ body{
     gap:24px;
 }
 
-/* TOPO */
-
 .topo{
     display:flex;
     justify-content:space-between;
@@ -124,8 +122,6 @@ body{
     box-shadow:0 8px 18px rgba(18,87,214,0.35);
 }
 
-/* CONTEUDO */
-
 .conteudo{
     flex:1;
     min-height:0;
@@ -155,8 +151,6 @@ body{
     border-bottom:2px solid #d7dee8;
 }
 
-/* ANDARES */
-
 .linha-container{
     margin-bottom:26px;
 }
@@ -173,8 +167,6 @@ body{
     grid-template-columns:repeat(auto-fill,minmax(110px,110px));
     gap:12px;
 }
-
-/* CHAVES */
 
 .chave{
     width:110px;
@@ -223,8 +215,6 @@ body{
     font-weight:600;
     line-height:1.1;
 }
-
-/* MODAL */
 
 .modal-overlay{
     position:fixed;
@@ -310,7 +300,6 @@ body{
     opacity:1;
 }
 
-/* FEEDBACK acima do overlay */
 .feedback{
     position:fixed;
     top:50%;

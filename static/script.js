@@ -122,10 +122,8 @@ async function registrar(tipo){
         return
     }
 
-    // sucesso -> limpa erro
     msg.innerText = ""
 
-    // sucesso -> mostra modal
     if(tipo === "RETIRADA"){
         mostrarFeedback("Retirada realizada com sucesso")
     }else{
@@ -160,13 +158,11 @@ function mostrarFeedback(texto){
 
     span.textContent = texto
 
-    // mostra
     overlay.classList.add("show")
     box.classList.add("show")
 
     setTimeout(()=>{
 
-        // esconde
         box.classList.remove("show")
         overlay.classList.remove("show")
 
