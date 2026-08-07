@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso administrativo | Sistema de Controle de Chaves</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="admin-body">
+    <main class="login-card">
+        <h1>Acesso administrativo</h1>
+        <p>Informe suas credenciais para continuar.</p>
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="alerta {{ categoria }}">{{ mensagem }}</p>
+            {% endfor %}
+        {% endwith %}
+        <form action="{{ url_for('web.admin') }}" method="post" class="admin-form">
+            <label for="prontuario">Prontuário</label>
+            <input class="input" id="prontuario" name="prontuario" required autofocus>
+            <label for="senha">Senha</label>
+            <input class="input" id="senha" name="senha" type="password" required>
+            <button class="btn devolver" type="submit">ENTRAR</button>
+        </form>
+    </main>
+</body>
+</html>

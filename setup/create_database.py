@@ -12,6 +12,15 @@ CREATE TABLE IF NOT EXISTS funcionarios (
 """)
 
 cursor.execute("""
+CREATE TABLE IF NOT EXISTS administradores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    prontuario TEXT UNIQUE NOT NULL,
+    nome TEXT NOT NULL,
+    senha_hash TEXT NOT NULL
+)
+""")
+
+cursor.execute("""
 CREATE TABLE IF NOT EXISTS chaves (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     codigo TEXT UNIQUE NOT NULL,

@@ -1,6 +1,7 @@
 import csv
 import io
 import re
+import sqlite3
 from datetime import datetime
 
 
@@ -45,6 +46,28 @@ def buscar_funcionario(conn, prontuario_input):
     if len(resultados) > 1:
         return None, "Múltiplos funcionários encontrados"
     return resultados[0], None
+
+
+def cadastrar_funcionario(conn, prontuario, nome):
+    prontuario = (prontuario or "").strip().upper()
+    nome = (nome or "").strip()
+
+    if not prontuario or not nome:
+        return {"status": "erro", "mensagem": "Informe o prontuário e o nome do funcionário."}
+
+    try:
+        conn.execute(
+            "INSERT INTO funcionarios (prontuario, nome) VALUES (?, ?)",
+            (prontuario, nome),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError as erro:
+        # A restrição UNIQUE do banco evita prontuários duplicados.
+        if "UNIQUE constraint failed" in str(erro):
+            return {"status": "erro", "mensagem": "Já existe um funcionário com esse prontuário."}
+        raise
+
+    return {"status": "ok", "mensagem": "Funcionário cadastrado com sucesso."}
 
 
 def registrar_emprestimo(conn, dados):
@@ -112,8 +135,9 @@ def detalhes_emprestimo(conn, codigo):
     }
 
 
-def exportar_emprestimos(conn):
-    dados = conn.execute("""
+def exportar_emprestimos(conn, somente_nao_exportados=True):
+    filtro_exportacao = "WHERE e.exportado = 0" if somente_nao_exportados else ""
+    dados = conn.execute(f"""
         SELECT e.id, fr.prontuario AS retirado_prontuario,
                fr.nome AS retirado_nome, fd.prontuario AS devolvido_prontuario,
                fd.nome AS devolvido_nome, c.codigo, e.data_retirada, e.data_devolucao
@@ -121,7 +145,7 @@ def exportar_emprestimos(conn):
         JOIN funcionarios fr ON fr.id = e.retirado_por
         LEFT JOIN funcionarios fd ON fd.id = e.devolvido_por
         JOIN chaves c ON c.id = e.chave_id
-        WHERE e.exportado = 0
+        {filtro_exportacao}
         ORDER BY e.data_retirada
     """).fetchall()
 
@@ -142,11 +166,12 @@ def exportar_emprestimos(conn):
             dado["codigo"], dado["data_retirada"], dado["data_devolucao"],
         ])
 
-    conn.executemany(
-        "UPDATE emprestimos SET exportado = 1 WHERE id = ?",
-        [(dado["id"],) for dado in dados],
-    )
-    conn.commit()
+    if somente_nao_exportados:
+        conn.executemany(
+            "UPDATE emprestimos SET exportado = 1 WHERE id = ?",
+            [(dado["id"],) for dado in dados],
+        )
+        conn.commit()
 
     nome_arquivo = datetime.now().strftime("emprestimos_%Y-%m-%d_%H-%M-%S.csv")
     return output.getvalue(), nome_arquivo

@@ -18,6 +18,16 @@ python setup/create_database.py
 python setup/insert_chaves.py
 ```
 
+## Administração
+
+A rota `/admin` exige um administrador cadastrado com prontuário, nome e senha. Crie o primeiro administrador pelo terminal (a senha é solicitada sem ficar visível):
+
+```bash
+python setup/create_admin.py PRONTUARIO "Nome do Administrador"
+```
+
+Após entrar, o painel permite cadastrar funcionários e gerar dois tipos de arquivo CSV: **Exportar últimos registros** (somente registros ainda não exportados) e **Exportar todos os registros** (inclui também os já exportados). As senhas são armazenadas somente como hash. Em produção, defina a variável de ambiente `SECRET_KEY` antes de iniciar a aplicação para preservar as sessões após reinicializações.
+
 ## Estrutura
 
 ```text
@@ -41,4 +51,4 @@ database.db                    # dados locais da aplicação
 - `database.py` é o único ponto de definição da localização e abertura do banco.
 - `app.py` somente inicializa o sistema, preservando o comando `python app.py`.
 
-As URLs públicas continuam as mesmas: `/`, `/admin`, `/estado`, `/registrar`, `/info/<codigo>` e `/exportar`.
+As URLs públicas continuam as mesmas: `/`, `/admin`, `/estado`, `/registrar` e `/info/<codigo>`. As exportações em `/exportar` e `/exportar/todos` são restritas à sessão de administrador.

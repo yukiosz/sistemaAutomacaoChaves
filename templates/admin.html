@@ -1,87 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Claviculário IFSP Bragança Paulista</title>
-    <link rel="stylesheet" href="../static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração | Sistema de Controle de Chaves</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
-<body>
-
-    <div class="app">
-
-        <header class="topo">
-
-            <div class="logo-area">
-                <img src="../static/images/logoIFSPBRA.png" alt="IFSP Bragança Paulista" class="logo">
-                <div class="titulo-area">
-                    <h1>Sistema de Controle de Chaves</h1>
-                </div>
+<body class="admin-body">
+    <main class="admin-container">
+        <header class="admin-header">
+            <div>
+                <h1>Administração</h1>
+                <p>Olá, {{ nome_admin }}.</p>
             </div>
-
-            <div class="controle-area">
-                <button class="btn exportar" onclick="exportarDados()">EXPORTAR</button>
-
-                <div class="inputs-area">
-                    <input type="text" class="input" id="idFuncionario" placeholder="Prontuário do Servidor" autofocus>
-                    <input type="text" class="input" id="codigoChave" placeholder="Código da Chave">
-
-                    <div id="mensagemErro" class="mensagem-erro"></div>
-                </div>
-
-                <div class="botoes">
-                    <button class="btn retirar" onclick="registrar('RETIRADA')">RETIRAR</button>
-                    <button class="btn devolver" onclick="registrar('DEVOLUCAO')">DEVOLVER</button>
-                </div>
-
-            </div>
-
+            <form action="{{ url_for('web.sair_admin') }}" method="post">
+                <button class="btn btn-sair" type="submit">SAIR</button>
+            </form>
         </header>
 
-        <main class="conteudo">
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="alerta {{ categoria }}">{{ mensagem }}</p>
+            {% endfor %}
+        {% endwith %}
 
-            <div class="blocos">
-
-                <section class="bloco bloco-a">
-                    <div class="bloco-titulo">PRÉDIO A</div>
-                    <div id="blocoA"></div>
-                </section>
-
-                <section class="bloco bloco-b">
-                    <div class="bloco-titulo">PRÉDIO B</div>
-                    <div id="blocoB"></div>
-                </section>
-
-            </div>
-
-        </main>
-
-    </div>
-
-    <div id="modalOverlay" class="modal-overlay hidden">
-        <div class="modal">
-            <h2>Informações da Chave</h2>
-            <div id="modalConteudo"></div>
-            <button class="fechar-modal" onclick="fecharModal()">Fechar</button>
-        </div>
-    </div>
-
-    <div id="feedbackOverlay" class="feedback-overlay"></div>
-
-    <div id="feedback" class="feedback">
-        <span id="feedbackTexto"></span>
-    </div>
-    
-    <script>
-        const params = new URLSearchParams(window.location.search);
-
-        if (params.get("msg") === "sem_dados") {
-            alert("Não há novos registros para exportar.");
-        }
-    </script>
-    <script src="../static/script.js"></script>
+        <section class="admin-acoes">
+            <article class="admin-card">
+                <h2>Exportar empréstimos</h2>
+                <p>Baixe os registros em formato CSV.</p>
+                <a class="btn exportar" href="{{ url_for('web.exportar') }}">EXPORTAR ÚLTIMOS REGISTROS</a>
+                <a class="btn exportar-todos" href="{{ url_for('web.exportar_todos') }}">EXPORTAR TODOS OS REGISTROS</a>
+            </article>
+            <article class="admin-card">
+                <h2>Cadastrar funcionário</h2>
+                <form action="{{ url_for('web.cadastrar_novo_funcionario') }}" method="post" class="admin-form">
+                    <label for="prontuario">Prontuário</label>
+                    <input class="input" id="prontuario" name="prontuario" required maxlength="50" autofocus>
+                    <label for="nome">Nome completo</label>
+                    <input class="input" id="nome" name="nome" required maxlength="150">
+                    <button class="btn retirar" type="submit">CADASTRAR</button>
+                </form>
+            </article>
+        </section>
+    </main>
 </body>
-
 </html>
