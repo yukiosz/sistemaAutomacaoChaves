@@ -1,4 +1,6 @@
 let emprestimos = []
+let temporizadorConfirmacaoDevolucao = null
+let segundosConfirmacaoDevolucao = 0
 
 const chavesA = [
 "A401","A402","A405","A406","A407","A408",
@@ -118,6 +120,11 @@ async function registrar(tipo){
     const resp = await r.json()
 
     if(resp.status === "erro"){
+        if(tipo === "RETIRADA" && resp.mensagem === "Chave não disponível"){
+            await carregarEstado()
+            mostrarConfirmacaoDevolucao(chave)
+            return
+        }
         msg.innerText = resp.mensagem || "Erro ao processar operação"
         return
     }
@@ -131,6 +138,38 @@ async function registrar(tipo){
     }
 
     carregarEstado()
+}
+
+function mostrarConfirmacaoDevolucao(chave){
+    fecharConfirmacaoDevolucao()
+
+    segundosConfirmacaoDevolucao = 5
+    document.getElementById("confirmacaoChave").textContent = chave
+    document.getElementById("confirmacaoContagem").textContent = segundosConfirmacaoDevolucao
+    document.getElementById("confirmacaoDevolucaoOverlay").classList.remove("hidden")
+
+    temporizadorConfirmacaoDevolucao = setInterval(()=>{
+        segundosConfirmacaoDevolucao -= 1
+        document.getElementById("confirmacaoContagem").textContent = segundosConfirmacaoDevolucao
+
+        if(segundosConfirmacaoDevolucao <= 0){
+            fecharConfirmacaoDevolucao()
+        }
+    },1000)
+}
+
+function fecharConfirmacaoDevolucao(){
+    if(temporizadorConfirmacaoDevolucao){
+        clearInterval(temporizadorConfirmacaoDevolucao)
+        temporizadorConfirmacaoDevolucao = null
+    }
+
+    document.getElementById("confirmacaoDevolucaoOverlay").classList.add("hidden")
+}
+
+function confirmarDevolucao(){
+    fecharConfirmacaoDevolucao()
+    registrar("DEVOLUCAO")
 }
 
 async function abrirModal(chave){

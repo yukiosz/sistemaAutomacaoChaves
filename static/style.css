@@ -328,6 +328,16 @@ body{
     transform:translate(-50%,-10px);
 }
 
+.confirmacao-overlay{ position:fixed; inset:0; display:flex; justify-content:center; align-items:center; padding:20px; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); z-index:10000; }
+.confirmacao-overlay.hidden{ display:none; }
+.confirmacao-modal{ width:min(480px,100%); padding:30px; border-radius:22px; background:#fff; color:#1f2937; box-shadow:0 20px 50px rgba(0,0,0,.3); text-align:center; }
+.confirmacao-modal h2{ margin-bottom:14px; color:#d90429; font-size:25px; }
+.confirmacao-modal p{ font-size:18px; line-height:1.45; }
+.confirmacao-contagem{ margin-top:14px; color:#64748b; font-size:15px !important; }
+.confirmacao-acoes{ display:flex; gap:12px; margin-top:24px; }
+.confirmacao-acoes .btn{ flex:1; min-width:0; }
+.fechar-confirmacao{ background:#64748b; box-shadow:0 8px 18px rgba(71,85,105,.28); }
+
 @keyframes fadeIn{
     from{
         opacity:0;

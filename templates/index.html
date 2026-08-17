@@ -72,6 +72,18 @@
         <span id="feedbackTexto"></span>
     </div>
 
+    <div id="confirmacaoDevolucaoOverlay" class="confirmacao-overlay hidden" role="presentation">
+        <section class="confirmacao-modal" role="dialog" aria-modal="true" aria-labelledby="confirmacaoDevolucaoTitulo">
+            <h2 id="confirmacaoDevolucaoTitulo">Chave já emprestada</h2>
+            <p>A chave <strong id="confirmacaoChave"></strong> está emprestada. Deseja registrar a devolução?</p>
+            <p class="confirmacao-contagem">Esta janela fechará em <span id="confirmacaoContagem">5</span>s.</p>
+            <div class="confirmacao-acoes">
+                <button type="button" class="btn devolver" onclick="confirmarDevolucao()">DEVOLVER</button>
+                <button type="button" class="btn fechar-confirmacao" onclick="fecharConfirmacaoDevolucao()">FECHAR</button>
+            </div>
+        </section>
+    </div>
+
 
     <script>
         const params = new URLSearchParams(window.location.search);
